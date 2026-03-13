@@ -49,7 +49,7 @@
                         <a href="#">M&eacute;dia</a>
                     </div>
                 </div>
-                <a href="#pricing" class="nav-item">Tarifs</a>
+                <a href="#features" class="nav-item">Fonctionnalit\u00e9s</a>
                 <a href="#" class="nav-item">Ressources</a>
             </div>
             <div class="nav-actions">
@@ -57,7 +57,7 @@
                 <a href="{{ url_for('dashboard') }}" class="btn-cta-nav">Mon Dashboard</a>
                 {% else %}
                 <a href="{{ url_for('login') }}" class="btn-login">Se connecter</a>
-                <a href="{{ url_for('login') }}" class="btn-cta-nav">Essai gratuit</a>
+                <a href="{{ url_for('login') }}" class="btn-cta-nav">Commencer</a>
                 {% endif %}
             </div>
             <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
@@ -80,7 +80,7 @@
             <p class="hero-subtitle">De la vid&eacute;o brute au short viral en 1 clic. Sous-titres, montage, publication &mdash; tout est automatis&eacute;.</p>
             <div class="hero-cta">
                 <a href="#" class="btn-primary btn-lg">
-                    Commencer gratuitement
+                    Commencer maintenant
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <span class="hero-no-cc">Aucune carte de cr&eacute;dit requise</span>
@@ -383,78 +383,6 @@
         </div>
     </section>
 
-    <!-- ========== PRICING ========== -->
-    <section class="pricing" id="pricing">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Tarifs</span>
-                <h2>Des prix <span class="text-gradient">simples</span> et transparents</h2>
-                <p>Commencez gratuitement, &eacute;voluez quand vous &ecirc;tes pr&ecirc;t.</p>
-                <div class="pricing-toggle">
-                    <span class="toggle-label active" data-plan="monthly">Mensuel</span>
-                    <button class="toggle-switch" id="pricingToggle" aria-label="Basculer entre mensuel et annuel">
-                        <span class="toggle-knob"></span>
-                    </button>
-                    <span class="toggle-label" data-plan="yearly">Annuel <span class="save-badge">-40%</span></span>
-                </div>
-            </div>
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <div class="pricing-name">Starter</div>
-                    <div class="pricing-price">
-                        <span class="price monthly">19&euro;</span>
-                        <span class="price yearly" style="display:none">11&euro;</span>
-                        <span class="price-period">/mois</span>
-                    </div>
-                    <p class="pricing-desc">Parfait pour d&eacute;buter avec les shorts</p>
-                    <ul class="pricing-features">
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> 20 vid&eacute;os / mois</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Sous-titres IA</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> 10 styles de captions</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Export HD</li>
-                    </ul>
-                    <a href="#" class="btn-pricing">Commencer</a>
-                </div>
-                <div class="pricing-card popular">
-                    <div class="popular-badge">Le plus populaire</div>
-                    <div class="pricing-name">Pro</div>
-                    <div class="pricing-price">
-                        <span class="price monthly">49&euro;</span>
-                        <span class="price yearly" style="display:none">29&euro;</span>
-                        <span class="price-period">/mois</span>
-                    </div>
-                    <p class="pricing-desc">Pour les cr&eacute;ateurs s&eacute;rieux</p>
-                    <ul class="pricing-features">
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> 100 vid&eacute;os / mois</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Magic Clips</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Auto-Edit</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Tous les styles</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Publication multi-plateformes</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Sans filigrane</li>
-                    </ul>
-                    <a href="#" class="btn-pricing btn-pricing-popular">Commencer</a>
-                </div>
-                <div class="pricing-card">
-                    <div class="pricing-name">Business</div>
-                    <div class="pricing-price">
-                        <span class="price monthly">99&euro;</span>
-                        <span class="price yearly" style="display:none">59&euro;</span>
-                        <span class="price-period">/mois</span>
-                    </div>
-                    <p class="pricing-desc">Pour les &eacute;quipes et les agences</p>
-                    <ul class="pricing-features">
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Vid&eacute;os illimit&eacute;es</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Avatars IA</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> API Access</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Espace &eacute;quipe</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Support prioritaire</li>
-                        <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8L7 12L13 4" stroke="#FF4F01" stroke-width="2" stroke-linecap="round"/></svg> Marque blanche</li>
-                    </ul>
-                    <a href="#" class="btn-pricing">Commencer</a>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- ========== FAQ ========== -->
     <section class="faq">
@@ -543,7 +471,7 @@
                 <h2>Pr&ecirc;t &agrave; cr&eacute;er du contenu <span class="text-gradient">viral</span> ?</h2>
                 <p>Rejoignez 4 millions d'utilisateurs qui transforment leur contenu avec MagicMoments.</p>
                 <a href="#" class="btn-primary btn-lg">
-                    Commencer gratuitement
+                    Commencer maintenant
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <span class="hero-no-cc">Aucune carte de cr&eacute;dit requise</span>
@@ -587,7 +515,6 @@
                     <h4>Entreprise</h4>
                     <a href="#">Blog</a>
                     <a href="#">Notre mission</a>
-                    <a href="#">Tarifs</a>
                     <a href="#">Avis</a>
                     <a href="#">Carri&egrave;res</a>
                 </div>
