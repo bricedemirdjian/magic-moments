@@ -12,13 +12,20 @@
         <option value="gradient" {% if project.caption_style == 'gradient' %}selected{% endif %}>Gradient Pop</option>
         <option value="karaoke" {% if project.caption_style == 'karaoke' %}selected{% endif %}>Karaoké</option>
     </select>
-    <button class="btn-secondary-sm" id="saveBtn">Sauvegarder</button>
+    <button class="btn-secondary-sm" id="saveBtn">
+        <span id="saveBtnText">Sauvegarder</span>
+    </button>
     <button class="btn-primary-sm" id="exportBtn">Exporter</button>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="editor-layout">
+    <!-- Toast notification -->
+    <div class="editor-toast" id="toast" style="display:none">
+        <span id="toastMsg"></span>
+    </div>
+
     <!-- Video Preview -->
     <div class="editor-preview">
         <div class="video-container">
@@ -34,8 +41,8 @@
                     </div>
                     {% endif %}
                     <div class="preview-captions" id="previewCaptions">
-                        <div class="caption-line active" data-style="classic">
-                            <span class="caption-text">Votre texte apparaîtra ici</span>
+                        <div class="caption-line" id="captionLine" data-style="{{ project.caption_style or 'classic' }}">
+                            <span class="caption-text" id="captionText"></span>
                         </div>
                     </div>
                 </div>
@@ -43,13 +50,14 @@
         </div>
         <div class="preview-controls">
             <button class="ctrl-btn" id="playBtn">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 4V16L16 10L6 4Z" fill="currentColor"/></svg>
+                <svg id="playIcon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 4V16L16 10L6 4Z" fill="currentColor"/></svg>
+                <svg id="pauseIcon" width="20" height="20" viewBox="0 0 20 20" fill="none" style="display:none"><rect x="5" y="4" width="3" height="12" rx="1" fill="currentColor"/><rect x="12" y="4" width="3" height="12" rx="1" fill="currentColor"/></svg>
             </button>
-            <div class="timeline-bar">
-                <div class="timeline-progress" style="width:35%"></div>
-                <div class="timeline-handle" style="left:35%"></div>
+            <div class="timeline-bar" id="timelineBar">
+                <div class="timeline-progress" id="timelineProgress" style="width:0%"></div>
+                <div class="timeline-handle" id="timelineHandle" style="left:0%"></div>
             </div>
-            <span class="time-display">0:05 / 0:15</span>
+            <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
         </div>
     </div>
 
@@ -71,24 +79,7 @@
                 </button>
             </div>
             <div class="subtitles-list" id="subtitlesList">
-                <div class="subtitle-item" data-index="0">
-                    <div class="sub-time">
-                        <input type="text" value="00:00" class="time-input"> - <input type="text" value="00:03" class="time-input">
-                    </div>
-                    <textarea class="sub-text" rows="2">Créez du contenu viral</textarea>
-                </div>
-                <div class="subtitle-item" data-index="1">
-                    <div class="sub-time">
-                        <input type="text" value="00:03" class="time-input"> - <input type="text" value="00:06" class="time-input">
-                    </div>
-                    <textarea class="sub-text" rows="2">avec MagicMoments</textarea>
-                </div>
-                <div class="subtitle-item" data-index="2">
-                    <div class="sub-time">
-                        <input type="text" value="00:06" class="time-input"> - <input type="text" value="00:10" class="time-input">
-                    </div>
-                    <textarea class="sub-text" rows="2">en quelques secondes !</textarea>
-                </div>
+                <!-- Subtitles loaded dynamically -->
             </div>
             <button class="add-subtitle-btn" id="addSubBtn">+ Ajouter un sous-titre</button>
         </div>
@@ -97,27 +88,27 @@
         <div class="panel-content" id="tab-style">
             <h3 class="panel-section-title">Style de sous-titres</h3>
             <div class="styles-grid">
-                <div class="style-option active" data-style="classic">
+                <div class="style-option {% if project.caption_style == 'classic' or not project.caption_style %}active{% endif %}" data-style="classic">
                     <div class="style-preview sp-classic">Texte viral</div>
                     <span>Classic</span>
                 </div>
-                <div class="style-option" data-style="bold">
+                <div class="style-option {% if project.caption_style == 'bold' %}active{% endif %}" data-style="bold">
                     <div class="style-preview sp-bold">Texte viral</div>
                     <span>Bold</span>
                 </div>
-                <div class="style-option" data-style="neon">
+                <div class="style-option {% if project.caption_style == 'neon' %}active{% endif %}" data-style="neon">
                     <div class="style-preview sp-neon">Texte viral</div>
                     <span>Neon</span>
                 </div>
-                <div class="style-option" data-style="minimal">
+                <div class="style-option {% if project.caption_style == 'minimal' %}active{% endif %}" data-style="minimal">
                     <div class="style-preview sp-minimal">Texte viral</div>
                     <span>Minimal</span>
                 </div>
-                <div class="style-option" data-style="gradient">
+                <div class="style-option {% if project.caption_style == 'gradient' %}active{% endif %}" data-style="gradient">
                     <div class="style-preview sp-gradient">Texte viral</div>
                     <span>Gradient</span>
                 </div>
-                <div class="style-option" data-style="karaoke">
+                <div class="style-option {% if project.caption_style == 'karaoke' %}active{% endif %}" data-style="karaoke">
                     <div class="style-preview sp-karaoke">Texte viral</div>
                     <span>Karaoké</span>
                 </div>
@@ -221,103 +212,413 @@
     </div>
 </div>
 
+<style>
+.editor-toast{position:fixed;top:80px;right:24px;background:#10b981;color:#fff;padding:12px 24px;border-radius:12px;font-size:.9rem;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:opacity .3s,transform .3s;opacity:0;transform:translateY(-10px)}
+.editor-toast.show{display:block!important;opacity:1;transform:translateY(0)}
+.editor-toast.error{background:#ef4444}
+.subtitle-item{position:relative}
+.sub-delete{position:absolute;top:8px;right:8px;background:rgba(239,68,68,.15);border:none;color:#ef4444;width:24px;height:24px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;transition:all .15s}
+.sub-delete:hover{background:#ef4444;color:#fff}
+.subtitle-item.active-sub{border-color:#FF4F01!important;background:rgba(255,79,1,.05)!important}
+.sub-goto{position:absolute;bottom:8px;right:8px;background:rgba(255,79,1,.15);border:none;color:#FF4F01;padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .15s}
+.sub-goto:hover{background:#FF4F01;color:#fff}
+#captionLine{transition:opacity .2s}
+</style>
+
 <script>
-// Panel tabs
-document.querySelectorAll('.panel-tab').forEach(tab=>{
-    tab.addEventListener('click',()=>{
-        document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
-        document.querySelectorAll('.panel-content').forEach(c=>c.classList.remove('active'));
+const PROJECT_ID = {{ project.id }};
+const captionLine = document.getElementById('captionLine');
+const captionText = document.getElementById('captionText');
+const subtitlesList = document.getElementById('subtitlesList');
+
+// ============ SUBTITLE DATA ============
+let subtitlesData = {{ subtitles | tojson }};
+
+// Parse time string "MM:SS" to seconds
+function timeToSec(t) {
+    if (!t) return 0;
+    const parts = t.split(':');
+    if (parts.length === 2) return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    if (parts.length === 3) return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+    return parseFloat(t) || 0;
+}
+
+// Seconds to "MM:SS" format
+function secToTime(s) {
+    s = Math.max(0, Math.floor(s));
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+
+// Format for display "M:SS"
+function fmtDisplay(s) {
+    s = Math.max(0, Math.floor(s));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+// ============ RENDER SUBTITLES LIST ============
+function renderSubtitles() {
+    subtitlesList.innerHTML = '';
+    subtitlesData.forEach((sub, i) => {
+        const div = document.createElement('div');
+        div.className = 'subtitle-item';
+        div.dataset.index = i;
+        div.innerHTML = `
+            <div class="sub-time">
+                <input type="text" value="${sub.start || '00:00'}" class="time-input time-start" data-idx="${i}">
+                <span style="margin:0 4px;color:rgba(255,255,255,.3)">—</span>
+                <input type="text" value="${sub.end || '00:03'}" class="time-input time-end" data-idx="${i}">
+            </div>
+            <textarea class="sub-text" rows="2" data-idx="${i}">${sub.text || ''}</textarea>
+            <button class="sub-delete" data-idx="${i}" title="Supprimer">&times;</button>
+            <button class="sub-goto" data-idx="${i}" title="Aller à ce moment">▶ Aller</button>
+        `;
+        subtitlesList.appendChild(div);
+    });
+
+    // Bind events
+    document.querySelectorAll('.sub-text').forEach(ta => {
+        ta.addEventListener('input', (e) => {
+            const idx = parseInt(e.target.dataset.idx);
+            subtitlesData[idx].text = e.target.value;
+            updatePreviewCaption();
+        });
+    });
+    document.querySelectorAll('.time-start').forEach(inp => {
+        inp.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.dataset.idx);
+            subtitlesData[idx].start = e.target.value;
+        });
+    });
+    document.querySelectorAll('.time-end').forEach(inp => {
+        inp.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.dataset.idx);
+            subtitlesData[idx].end = e.target.value;
+        });
+    });
+    document.querySelectorAll('.sub-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.dataset.idx);
+            subtitlesData.splice(idx, 1);
+            renderSubtitles();
+            updatePreviewCaption();
+        });
+    });
+    document.querySelectorAll('.sub-goto').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.target.closest('[data-idx]').dataset.idx);
+            const sub = subtitlesData[idx];
+            if (video && sub) {
+                video.currentTime = timeToSec(sub.start);
+                video.play();
+            }
+        });
+    });
+}
+
+// ============ CAPTION PREVIEW SYNC ============
+function updatePreviewCaption(currentTime) {
+    if (typeof currentTime === 'undefined') {
+        currentTime = video ? video.currentTime : 0;
+    }
+
+    let activeText = '';
+    let activeIdx = -1;
+
+    for (let i = 0; i < subtitlesData.length; i++) {
+        const sub = subtitlesData[i];
+        const start = timeToSec(sub.start);
+        const end = timeToSec(sub.end);
+        if (currentTime >= start && currentTime < end) {
+            activeText = sub.text;
+            activeIdx = i;
+            break;
+        }
+    }
+
+    captionText.textContent = activeText;
+    captionLine.style.opacity = activeText ? '1' : '0';
+
+    // Highlight active subtitle in list
+    document.querySelectorAll('.subtitle-item').forEach((item, idx) => {
+        item.classList.toggle('active-sub', idx === activeIdx);
+    });
+}
+
+// ============ TOAST ============
+function showToast(msg, isError) {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    toastMsg.textContent = msg;
+    toast.className = 'editor-toast' + (isError ? ' error' : '');
+    toast.style.display = 'block';
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
+    }, 2500);
+}
+
+// ============ PANEL TABS ============
+document.querySelectorAll('.panel-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel-content').forEach(c => c.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
     });
 });
 
-// Style options
-document.querySelectorAll('.style-option').forEach(opt=>{
-    opt.addEventListener('click',()=>{
-        document.querySelectorAll('.style-option').forEach(o=>o.classList.remove('active'));
+// ============ STYLE OPTIONS ============
+document.querySelectorAll('.style-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+        document.querySelectorAll('.style-option').forEach(o => o.classList.remove('active'));
         opt.classList.add('active');
-        document.getElementById('captionStyle').value=opt.dataset.style;
-        const preview=document.querySelector('.caption-line');
-        if(preview) preview.dataset.style=opt.dataset.style;
+        document.getElementById('captionStyle').value = opt.dataset.style;
+        captionLine.dataset.style = opt.dataset.style;
     });
 });
 
-// Color dots
-document.querySelectorAll('.color-dot').forEach(dot=>{
-    dot.addEventListener('click',()=>{
-        document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+// ============ COLOR DOTS ============
+document.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
         dot.classList.add('active');
     });
 });
 
-// Add subtitle
-document.getElementById('addSubBtn').addEventListener('click',()=>{
-    const list=document.getElementById('subtitlesList');
-    const count=list.children.length;
-    const div=document.createElement('div');
-    div.className='subtitle-item';
-    div.dataset.index=count;
-    div.innerHTML=`<div class="sub-time"><input type="text" value="00:00" class="time-input"> - <input type="text" value="00:03" class="time-input"></div><textarea class="sub-text" rows="2">Nouveau sous-titre</textarea>`;
-    list.appendChild(div);
-});
-
-// Auto-generate subtitles
-document.getElementById('autoSubBtn').addEventListener('click',()=>{
-    const list=document.getElementById('subtitlesList');
-    const subs=[
-        {s:'00:00',e:'00:02',t:'Salut tout le monde !'},
-        {s:'00:02',e:'00:05',t:"Aujourd'hui je vous montre"},
-        {s:'00:05',e:'00:08',t:'comment créer du contenu viral'},
-        {s:'00:08',e:'00:11',t:'avec MagicMoments'},
-        {s:'00:11',e:'00:14',t:"C'est ultra rapide"},
-        {s:'00:14',e:'00:16',t:'Essayez maintenant !'}
-    ];
-    list.innerHTML='';
-    subs.forEach((sub,i)=>{
-        const div=document.createElement('div');
-        div.className='subtitle-item';
-        div.dataset.index=i;
-        div.innerHTML=`<div class="sub-time"><input type="text" value="${sub.s}" class="time-input"> - <input type="text" value="${sub.e}" class="time-input"></div><textarea class="sub-text" rows="2">${sub.t}</textarea>`;
-        list.appendChild(div);
+// ============ ADD SUBTITLE ============
+document.getElementById('addSubBtn').addEventListener('click', () => {
+    let lastEnd = '00:00';
+    if (subtitlesData.length > 0) {
+        lastEnd = subtitlesData[subtitlesData.length - 1].end || '00:00';
+    }
+    const startSec = timeToSec(lastEnd);
+    const endSec = startSec + 3;
+    subtitlesData.push({
+        start: secToTime(startSec),
+        end: secToTime(endSec),
+        text: ''
     });
+    renderSubtitles();
+    // Focus the new textarea
+    const textareas = subtitlesList.querySelectorAll('.sub-text');
+    if (textareas.length > 0) {
+        const last = textareas[textareas.length - 1];
+        last.focus();
+        last.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 });
 
-// Save
-document.getElementById('saveBtn').addEventListener('click',async()=>{
-    const subs=[];
-    document.querySelectorAll('.subtitle-item').forEach(item=>{
-        const times=item.querySelectorAll('.time-input');
-        subs.push({start:times[0].value,end:times[1].value,text:item.querySelector('.sub-text').value});
+// ============ AUTO-GENERATE SUBTITLES ============
+document.getElementById('autoSubBtn').addEventListener('click', () => {
+    const btn = document.getElementById('autoSubBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" class="spin-icon"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2" stroke-dasharray="20" stroke-dashoffset="5"/></svg> Génération en cours...';
+
+    // Simulate AI generation with a delay
+    setTimeout(() => {
+        let duration = 16;
+        if (video && video.duration && !isNaN(video.duration)) {
+            duration = Math.floor(video.duration);
+        }
+
+        // Generate subtitles based on video duration
+        const segmentDuration = Math.max(2, Math.min(4, Math.floor(duration / 5)));
+        const newSubs = [];
+        let t = 0;
+        const phrases = [
+            'Salut tout le monde !',
+            "Aujourd'hui on va voir",
+            'quelque chose de fou',
+            "Regardez bien ce qui va se passer",
+            "C'est incroyable non ?",
+            'Abonnez-vous pour plus !',
+            'Laissez un commentaire',
+            "N'oubliez pas le like",
+            'Partagez avec vos amis',
+            "C'est la fin, merci !"
+        ];
+
+        let phraseIdx = 0;
+        while (t < duration && phraseIdx < phrases.length) {
+            const end = Math.min(t + segmentDuration, duration);
+            newSubs.push({
+                start: secToTime(t),
+                end: secToTime(end),
+                text: phrases[phraseIdx]
+            });
+            t = end;
+            phraseIdx++;
+        }
+
+        subtitlesData = newSubs;
+        renderSubtitles();
+        updatePreviewCaption();
+
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M5 7H9M7 5V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Générer automatiquement';
+        showToast('Sous-titres générés ! Vous pouvez les modifier.');
+    }, 1500);
+});
+
+// ============ SAVE ============
+document.getElementById('saveBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveBtn');
+    const btnText = document.getElementById('saveBtnText');
+    btn.disabled = true;
+    btnText.textContent = 'Sauvegarde...';
+
+    // Collect current data from DOM
+    const subs = [];
+    document.querySelectorAll('.subtitle-item').forEach(item => {
+        const startInput = item.querySelector('.time-start');
+        const endInput = item.querySelector('.time-end');
+        const textArea = item.querySelector('.sub-text');
+        if (startInput && endInput && textArea) {
+            subs.push({
+                start: startInput.value,
+                end: endInput.value,
+                text: textArea.value
+            });
+        }
     });
-    const style=document.getElementById('captionStyle').value;
-    await fetch('/api/project/{{ project.id }}/subtitles',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({subtitles:subs,style})
-    });
-    alert('Sauvegardé !');
+
+    const style = document.getElementById('captionStyle').value;
+
+    try {
+        const resp = await fetch('/api/project/' + PROJECT_ID + '/subtitles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subtitles: subs, style: style })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            subtitlesData = subs;
+            showToast('Sauvegardé avec succès !');
+        } else {
+            showToast('Erreur lors de la sauvegarde', true);
+        }
+    } catch (err) {
+        console.error('Save error:', err);
+        showToast('Erreur de connexion', true);
+    }
+
+    btn.disabled = false;
+    btnText.textContent = 'Sauvegarder';
 });
 
-// Export
-document.getElementById('exportBtn').addEventListener('click',()=>{
-    alert('Export en cours... Votre vidéo sera prête dans quelques instants.');
+// ============ EXPORT ============
+document.getElementById('exportBtn').addEventListener('click', () => {
+    showToast('Export en cours... Votre vidéo sera prête dans quelques instants.');
 });
 
-// Video play/pause
+// ============ VIDEO PLAYER ============
 const video = document.getElementById('projectVideo');
+const playBtn = document.getElementById('playBtn');
+const playIcon = document.getElementById('playIcon');
+const pauseIcon = document.getElementById('pauseIcon');
+const timelineBar = document.getElementById('timelineBar');
+const timelineProgress = document.getElementById('timelineProgress');
+const timelineHandle = document.getElementById('timelineHandle');
+const timeDisplay = document.getElementById('timeDisplay');
+
 if (video) {
-    document.getElementById('playBtn').addEventListener('click', () => {
-        if (video.paused) { video.play(); } else { video.pause(); }
+    // Play/Pause
+    playBtn.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
     });
+
+    video.addEventListener('play', () => {
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+    });
+
+    video.addEventListener('pause', () => {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+    });
+
+    video.addEventListener('ended', () => {
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+    });
+
+    // Time update - sync captions
     video.addEventListener('timeupdate', () => {
         const pct = (video.currentTime / video.duration) * 100;
-        document.querySelector('.timeline-progress').style.width = pct + '%';
-        document.querySelector('.timeline-handle').style.left = pct + '%';
-        const cur = Math.floor(video.currentTime);
-        const dur = Math.floor(video.duration) || 0;
-        const fmt = (s) => Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
-        document.querySelector('.time-display').textContent = fmt(cur) + ' / ' + fmt(dur);
+        timelineProgress.style.width = pct + '%';
+        timelineHandle.style.left = pct + '%';
+        timeDisplay.textContent = fmtDisplay(video.currentTime) + ' / ' + fmtDisplay(video.duration);
+        updatePreviewCaption(video.currentTime);
     });
+
+    // Loaded metadata
+    video.addEventListener('loadedmetadata', () => {
+        timeDisplay.textContent = '0:00 / ' + fmtDisplay(video.duration);
+    });
+
+    // Timeline seek (click on timeline bar)
+    timelineBar.addEventListener('click', (e) => {
+        const rect = timelineBar.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, x / rect.width));
+        video.currentTime = pct * video.duration;
+    });
+
+    // Timeline drag
+    let isDragging = false;
+    timelineBar.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = timelineBar.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, x / rect.width));
+        video.currentTime = pct * video.duration;
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const rect = timelineBar.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, x / rect.width));
+        video.currentTime = pct * video.duration;
+    });
+    document.addEventListener('mouseup', () => { isDragging = false; });
+} else {
+    // No video - just show captions based on first subtitle if exists
+    if (subtitlesData.length > 0) {
+        captionText.textContent = subtitlesData[0].text;
+        captionLine.style.opacity = '1';
+    }
+}
+
+// ============ FONT SIZE ============
+document.getElementById('fontSize').addEventListener('input', (e) => {
+    captionText.style.fontSize = e.target.value + 'px';
+});
+
+// ============ CAPTION POSITION ============
+document.getElementById('captionPos').addEventListener('input', (e) => {
+    const previewCaptions = document.getElementById('previewCaptions');
+    previewCaptions.style.bottom = (100 - parseInt(e.target.value)) + '%';
+});
+
+// ============ INIT ============
+renderSubtitles();
+if (subtitlesData.length > 0 && !video) {
+    captionText.textContent = subtitlesData[0].text;
+    captionLine.style.opacity = '1';
+} else {
+    captionLine.style.opacity = '0';
 }
 </script>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin-icon { animation: spin 1s linear infinite; }
+</style>
 {% endblock %}
