@@ -5,12 +5,15 @@ from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, session, request, jsonify, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from authlib.integrations.flask_client import OAuth
+from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 # Flask-Login
 login_manager = LoginManager()
