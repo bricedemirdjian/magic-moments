@@ -1,0 +1,106 @@
+{% extends "base_app.html" %}
+{% block title %}Dashboard - MagicMoments{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('new_project') }}" class="btn-primary-sm">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    Nouveau projet
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon si-blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M9 8V16L16 12L9 8Z" fill="currentColor"/></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-number">{{ stats.total_projects }}</span>
+            <span class="stat-label">Projets</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon si-green">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 12L14 20L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12L6 16L14 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-number">{{ stats.published }}</span>
+            <span class="stat-label">Publiés</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon si-orange">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-number">{{ stats.total_views }}</span>
+            <span class="stat-label">Vues totales</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon si-purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="stat-info">
+            <span class="stat-number">{{ stats.draft }}</span>
+            <span class="stat-label">Brouillons</span>
+        </div>
+    </div>
+</div>
+
+<!-- Projects -->
+<div class="section-title">
+    <h2>Mes projets</h2>
+</div>
+
+{% if projects %}
+<div class="projects-grid">
+    {% for project in projects %}
+    <div class="project-card" data-id="{{ project.id }}">
+        <div class="project-thumb">
+            <div class="project-thumb-placeholder">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5"/><path d="M13 11V21L22 16L13 11Z" fill="currentColor"/></svg>
+            </div>
+            <div class="project-status status-{{ project.status }}">{{ project.status }}</div>
+        </div>
+        <div class="project-info">
+            <h3>{{ project.title }}</h3>
+            <div class="project-meta">
+                <span>{{ project.created_at[:10] if project.created_at else '' }}</span>
+                <span>{{ project.views }} vues</span>
+            </div>
+        </div>
+        <div class="project-actions">
+            <a href="{{ url_for('editor', project_id=project.id) }}" class="project-btn">Éditer</a>
+            <button class="project-btn-icon delete-project" data-id="{{ project.id }}" title="Supprimer">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4H14M5 4V3C5 2.45 5.45 2 6 2H10C10.55 2 11 2.45 11 3V4M13 4V13C13 13.55 12.55 14 12 14H4C3.45 14 3 13.55 3 13V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><rect x="12" y="12" width="40" height="40" rx="8" stroke="currentColor" stroke-width="2"/><path d="M26 24V40L40 32L26 24Z" fill="currentColor" opacity="0.3"/><path d="M26 24V40L40 32L26 24Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </div>
+    <h3>Aucun projet pour le moment</h3>
+    <p>Créez votre premier projet pour commencer à générer du contenu viral.</p>
+    <a href="{{ url_for('new_project') }}" class="btn-primary-sm">Créer un projet</a>
+</div>
+{% endif %}
+
+<script>
+document.querySelectorAll('.delete-project').forEach(btn=>{
+    btn.addEventListener('click',async(e)=>{
+        e.preventDefault();
+        if(!confirm('Supprimer ce projet ?')) return;
+        const id=btn.dataset.id;
+        const r=await fetch('/api/project/'+id,{method:'DELETE'});
+        if(r.ok) btn.closest('.project-card').remove();
+    });
+});
+</script>
+{% endblock %}

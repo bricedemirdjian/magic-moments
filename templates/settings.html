@@ -1,0 +1,101 @@
+{% extends "base_app.html" %}
+{% block title %}Paramètres - MagicMoments{% endblock %}
+{% block page_title %}Paramètres{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="settings-section">
+        <h3>Profil</h3>
+        <div class="settings-card">
+            <div class="profile-row">
+                <img src="{{ user.picture or '' }}" alt="{{ user.name }}" class="settings-avatar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div class="settings-avatar-fallback" style="display:none">{{ user.name[0] }}</div>
+                <div class="profile-info">
+                    <strong>{{ user.name }}</strong>
+                    <span>{{ user.email }}</span>
+                    <small>Membre depuis {{ user.created_at[:10] if user.created_at else 'récemment' }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>Abonnement</h3>
+        <div class="settings-card">
+            <div class="plan-row">
+                <div>
+                    <strong>Plan {{ user.plan | capitalize }}</strong>
+                    <p>5 vidéos par mois incluses</p>
+                </div>
+                <a href="#" class="btn-primary-sm">Passer au Pro</a>
+            </div>
+            <div class="usage-bar">
+                <div class="usage-label">
+                    <span>Utilisation ce mois</span>
+                    <span>2 / 5 vidéos</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:40%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>Préférences</h3>
+        <div class="settings-card">
+            <div class="pref-row">
+                <div>
+                    <strong>Langue des sous-titres</strong>
+                    <small>Langue par défaut pour la génération automatique</small>
+                </div>
+                <select class="text-input" style="width:auto">
+                    <option selected>Français</option>
+                    <option>English</option>
+                    <option>Español</option>
+                    <option>Deutsch</option>
+                    <option>Português</option>
+                    <option>Italiano</option>
+                </select>
+            </div>
+            <div class="pref-row">
+                <div>
+                    <strong>Style de captions par défaut</strong>
+                    <small>Appliqué automatiquement aux nouveaux projets</small>
+                </div>
+                <select class="text-input" style="width:auto">
+                    <option>Classic</option>
+                    <option>Bold Impact</option>
+                    <option>Neon Glow</option>
+                    <option>Minimal</option>
+                    <option selected>Gradient Pop</option>
+                    <option>Karaoké</option>
+                </select>
+            </div>
+            <div class="pref-row">
+                <div>
+                    <strong>Notifications par email</strong>
+                    <small>Recevez des mises à jour sur vos projets</small>
+                </div>
+                <label class="toggle-input">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>Zone de danger</h3>
+        <div class="settings-card settings-card-danger">
+            <div class="pref-row">
+                <div>
+                    <strong>Supprimer mon compte</strong>
+                    <small>Cette action est irréversible.</small>
+                </div>
+                <button class="btn-danger-sm">Supprimer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

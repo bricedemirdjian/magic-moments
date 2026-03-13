@@ -1,0 +1,55 @@
+{% extends "base_app.html" %}
+{% block title %}Nouveau projet - MagicMoments{% endblock %}
+{% block page_title %}Nouveau projet{% endblock %}
+
+{% block content %}
+<div class="create-page">
+    <div class="create-options">
+        <h2>Comment souhaitez-vous commencer ?</h2>
+        <p>Choisissez une méthode pour créer votre prochain short viral.</p>
+
+        <div class="create-grid">
+            <form method="POST" class="create-card" id="uploadForm">
+                <input type="hidden" name="title" value="Nouvelle vidéo">
+                <div class="create-icon ci-orange">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16 4V28M4 16H28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                <h3>Uploader une vidéo</h3>
+                <p>Importez votre vidéo et laissez l'IA faire le reste.</p>
+                <div class="upload-zone" id="uploadZone">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 28V12M12 20L20 12L28 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 28H34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span>Glissez votre vidéo ici ou <em>cliquez pour parcourir</em></span>
+                    <small>MP4, MOV, AVI — Max 500MB</small>
+                </div>
+                <button type="submit" class="btn-primary-sm" style="width:100%;margin-top:16px">Commencer le projet</button>
+            </form>
+
+            <form method="POST" class="create-card">
+                <input type="hidden" name="title" id="ytTitle" value="Vidéo YouTube">
+                <div class="create-icon ci-red">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M28.8 9.6a3.5 3.5 0 00-2.5-2.5C24.1 6.5 16 6.5 16 6.5s-8.1 0-10.3.6a3.5 3.5 0 00-2.5 2.5C2.5 11.8 2.5 16 2.5 16s0 4.2.7 6.4a3.5 3.5 0 002.5 2.5c2.2.6 10.3.6 10.3.6s8.1 0 10.3-.6a3.5 3.5 0 002.5-2.5c.7-2.2.7-6.4.7-6.4s0-4.2-.7-6.4z" fill="currentColor" opacity="0.2"/><path d="M13 20.5V11.5L21 16L13 20.5Z" fill="currentColor"/></svg>
+                </div>
+                <h3>Lien YouTube</h3>
+                <p>Collez un lien YouTube pour extraire et éditer la vidéo.</p>
+                <div class="input-group">
+                    <input type="url" placeholder="https://youtube.com/watch?v=..." class="text-input" name="youtube_url">
+                </div>
+                <button type="submit" class="btn-primary-sm" style="width:100%;margin-top:16px">Importer</button>
+            </form>
+
+            <form method="POST" class="create-card">
+                <input type="hidden" name="title" value="Texte vers vidéo">
+                <div class="create-icon ci-purple">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M6 8H26M6 14H20M6 20H24M6 26H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+                <h3>Texte vers Vidéo</h3>
+                <p>Transformez un texte ou un script en vidéo avec avatar IA.</p>
+                <div class="input-group">
+                    <textarea placeholder="Entrez votre script ici..." class="text-input" rows="3" name="script"></textarea>
+                </div>
+                <button type="submit" class="btn-primary-sm" style="width:100%;margin-top:16px">Générer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

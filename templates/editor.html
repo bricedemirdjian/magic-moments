@@ -1,0 +1,302 @@
+{% extends "base_app.html" %}
+{% block title %}Éditeur - {{ project.title }} - MagicMoments{% endblock %}
+{% block page_title %}{{ project.title }}{% endblock %}
+
+{% block topbar_actions %}
+<div class="editor-actions">
+    <select class="style-select" id="captionStyle">
+        <option value="classic" {% if project.caption_style == 'classic' %}selected{% endif %}>Classic</option>
+        <option value="bold" {% if project.caption_style == 'bold' %}selected{% endif %}>Bold Impact</option>
+        <option value="neon" {% if project.caption_style == 'neon' %}selected{% endif %}>Neon Glow</option>
+        <option value="minimal" {% if project.caption_style == 'minimal' %}selected{% endif %}>Minimal</option>
+        <option value="gradient" {% if project.caption_style == 'gradient' %}selected{% endif %}>Gradient Pop</option>
+        <option value="karaoke" {% if project.caption_style == 'karaoke' %}selected{% endif %}>Karaoké</option>
+    </select>
+    <button class="btn-secondary-sm" id="saveBtn">Sauvegarder</button>
+    <button class="btn-primary-sm" id="exportBtn">Exporter</button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="editor-layout">
+    <!-- Video Preview -->
+    <div class="editor-preview">
+        <div class="video-container">
+            <div class="phone-frame">
+                <div class="phone-notch"></div>
+                <div class="phone-screen">
+                    <div class="video-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.3"/><path d="M20 16V32L32 24L20 16Z" fill="currentColor" opacity="0.5"/></svg>
+                        <p>Aperçu vidéo</p>
+                    </div>
+                    <div class="preview-captions" id="previewCaptions">
+                        <div class="caption-line active" data-style="classic">
+                            <span class="caption-text">Votre texte apparaîtra ici</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="preview-controls">
+            <button class="ctrl-btn" id="playBtn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 4V16L16 10L6 4Z" fill="currentColor"/></svg>
+            </button>
+            <div class="timeline-bar">
+                <div class="timeline-progress" style="width:35%"></div>
+                <div class="timeline-handle" style="left:35%"></div>
+            </div>
+            <span class="time-display">0:05 / 0:15</span>
+        </div>
+    </div>
+
+    <!-- Editor Panel -->
+    <div class="editor-panel">
+        <div class="panel-tabs">
+            <button class="panel-tab active" data-tab="subtitles">Sous-titres</button>
+            <button class="panel-tab" data-tab="style">Style</button>
+            <button class="panel-tab" data-tab="edit">Montage</button>
+            <button class="panel-tab" data-tab="music">Musique</button>
+        </div>
+
+        <!-- Subtitles Tab -->
+        <div class="panel-content active" id="tab-subtitles">
+            <div class="panel-toolbar">
+                <button class="btn-secondary-sm" id="autoSubBtn">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M5 7H9M7 5V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                    Générer automatiquement
+                </button>
+            </div>
+            <div class="subtitles-list" id="subtitlesList">
+                <div class="subtitle-item" data-index="0">
+                    <div class="sub-time">
+                        <input type="text" value="00:00" class="time-input"> - <input type="text" value="00:03" class="time-input">
+                    </div>
+                    <textarea class="sub-text" rows="2">Créez du contenu viral</textarea>
+                </div>
+                <div class="subtitle-item" data-index="1">
+                    <div class="sub-time">
+                        <input type="text" value="00:03" class="time-input"> - <input type="text" value="00:06" class="time-input">
+                    </div>
+                    <textarea class="sub-text" rows="2">avec MagicMoments</textarea>
+                </div>
+                <div class="subtitle-item" data-index="2">
+                    <div class="sub-time">
+                        <input type="text" value="00:06" class="time-input"> - <input type="text" value="00:10" class="time-input">
+                    </div>
+                    <textarea class="sub-text" rows="2">en quelques secondes !</textarea>
+                </div>
+            </div>
+            <button class="add-subtitle-btn" id="addSubBtn">+ Ajouter un sous-titre</button>
+        </div>
+
+        <!-- Style Tab -->
+        <div class="panel-content" id="tab-style">
+            <h3 class="panel-section-title">Style de sous-titres</h3>
+            <div class="styles-grid">
+                <div class="style-option active" data-style="classic">
+                    <div class="style-preview sp-classic">Texte viral</div>
+                    <span>Classic</span>
+                </div>
+                <div class="style-option" data-style="bold">
+                    <div class="style-preview sp-bold">Texte viral</div>
+                    <span>Bold</span>
+                </div>
+                <div class="style-option" data-style="neon">
+                    <div class="style-preview sp-neon">Texte viral</div>
+                    <span>Neon</span>
+                </div>
+                <div class="style-option" data-style="minimal">
+                    <div class="style-preview sp-minimal">Texte viral</div>
+                    <span>Minimal</span>
+                </div>
+                <div class="style-option" data-style="gradient">
+                    <div class="style-preview sp-gradient">Texte viral</div>
+                    <span>Gradient</span>
+                </div>
+                <div class="style-option" data-style="karaoke">
+                    <div class="style-preview sp-karaoke">Texte viral</div>
+                    <span>Karaoké</span>
+                </div>
+            </div>
+
+            <h3 class="panel-section-title" style="margin-top:24px">Options</h3>
+            <div class="option-row">
+                <label>Taille du texte</label>
+                <input type="range" min="12" max="48" value="24" class="range-input" id="fontSize">
+            </div>
+            <div class="option-row">
+                <label>Position verticale</label>
+                <input type="range" min="20" max="80" value="75" class="range-input" id="captionPos">
+            </div>
+            <div class="option-row">
+                <label>Couleur d'accentuation</label>
+                <div class="color-options">
+                    <button class="color-dot active" style="background:#FF4F01" data-color="#FF4F01"></button>
+                    <button class="color-dot" style="background:#FBBF24" data-color="#FBBF24"></button>
+                    <button class="color-dot" style="background:#34D399" data-color="#34D399"></button>
+                    <button class="color-dot" style="background:#818CF8" data-color="#818CF8"></button>
+                    <button class="color-dot" style="background:#F472B6" data-color="#F472B6"></button>
+                    <button class="color-dot" style="background:#FFFFFF" data-color="#FFFFFF"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Tab -->
+        <div class="panel-content" id="tab-edit">
+            <h3 class="panel-section-title">Outils de montage</h3>
+            <div class="edit-tools">
+                <button class="edit-tool-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 4V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Couper
+                </button>
+                <button class="edit-tool-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 3V17H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 13L10 8L13 11L17 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Supprimer les silences
+                </button>
+                <button class="edit-tool-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M10 6V10L13 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Ajuster la vitesse
+                </button>
+                <button class="edit-tool-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 7H17M7 3V17" stroke="currentColor" stroke-width="1.5"/></svg>
+                    Recadrer
+                </button>
+                <button class="edit-tool-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2 10C2 10 5 4 10 4S18 10 18 10 15 16 10 16 2 10 2 10Z" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    B-Roll IA
+                </button>
+                <button class="edit-tool-btn">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Transitions
+                </button>
+            </div>
+        </div>
+
+        <!-- Music Tab -->
+        <div class="panel-content" id="tab-music">
+            <h3 class="panel-section-title">Musique de fond</h3>
+            <div class="music-list">
+                <div class="music-item">
+                    <div class="music-info">
+                        <span class="music-title">Energetic Beat</span>
+                        <small>0:30 — Pop/Électro</small>
+                    </div>
+                    <button class="music-play">▶</button>
+                    <button class="btn-secondary-sm music-add">Utiliser</button>
+                </div>
+                <div class="music-item">
+                    <div class="music-info">
+                        <span class="music-title">Chill Vibes</span>
+                        <small>0:45 — Lo-Fi</small>
+                    </div>
+                    <button class="music-play">▶</button>
+                    <button class="btn-secondary-sm music-add">Utiliser</button>
+                </div>
+                <div class="music-item">
+                    <div class="music-info">
+                        <span class="music-title">Motivation</span>
+                        <small>0:25 — Hip-Hop</small>
+                    </div>
+                    <button class="music-play">▶</button>
+                    <button class="btn-secondary-sm music-add">Utiliser</button>
+                </div>
+                <div class="music-item">
+                    <div class="music-info">
+                        <span class="music-title">Corporate</span>
+                        <small>0:40 — Business</small>
+                    </div>
+                    <button class="music-play">▶</button>
+                    <button class="btn-secondary-sm music-add">Utiliser</button>
+                </div>
+            </div>
+            <div class="option-row" style="margin-top:16px">
+                <label>Volume musique</label>
+                <input type="range" min="0" max="100" value="30" class="range-input">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Panel tabs
+document.querySelectorAll('.panel-tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+        document.querySelectorAll('.panel-tab').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('.panel-content').forEach(c=>c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    });
+});
+
+// Style options
+document.querySelectorAll('.style-option').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+        document.querySelectorAll('.style-option').forEach(o=>o.classList.remove('active'));
+        opt.classList.add('active');
+        document.getElementById('captionStyle').value=opt.dataset.style;
+        const preview=document.querySelector('.caption-line');
+        if(preview) preview.dataset.style=opt.dataset.style;
+    });
+});
+
+// Color dots
+document.querySelectorAll('.color-dot').forEach(dot=>{
+    dot.addEventListener('click',()=>{
+        document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+        dot.classList.add('active');
+    });
+});
+
+// Add subtitle
+document.getElementById('addSubBtn').addEventListener('click',()=>{
+    const list=document.getElementById('subtitlesList');
+    const count=list.children.length;
+    const div=document.createElement('div');
+    div.className='subtitle-item';
+    div.dataset.index=count;
+    div.innerHTML=`<div class="sub-time"><input type="text" value="00:00" class="time-input"> - <input type="text" value="00:03" class="time-input"></div><textarea class="sub-text" rows="2">Nouveau sous-titre</textarea>`;
+    list.appendChild(div);
+});
+
+// Auto-generate subtitles
+document.getElementById('autoSubBtn').addEventListener('click',()=>{
+    const list=document.getElementById('subtitlesList');
+    const subs=[
+        {s:'00:00',e:'00:02',t:'Salut tout le monde !'},
+        {s:'00:02',e:'00:05',t:"Aujourd'hui je vous montre"},
+        {s:'00:05',e:'00:08',t:'comment créer du contenu viral'},
+        {s:'00:08',e:'00:11',t:'avec MagicMoments'},
+        {s:'00:11',e:'00:14',t:"C'est ultra rapide"},
+        {s:'00:14',e:'00:16',t:'Essayez maintenant !'}
+    ];
+    list.innerHTML='';
+    subs.forEach((sub,i)=>{
+        const div=document.createElement('div');
+        div.className='subtitle-item';
+        div.dataset.index=i;
+        div.innerHTML=`<div class="sub-time"><input type="text" value="${sub.s}" class="time-input"> - <input type="text" value="${sub.e}" class="time-input"></div><textarea class="sub-text" rows="2">${sub.t}</textarea>`;
+        list.appendChild(div);
+    });
+});
+
+// Save
+document.getElementById('saveBtn').addEventListener('click',async()=>{
+    const subs=[];
+    document.querySelectorAll('.subtitle-item').forEach(item=>{
+        const times=item.querySelectorAll('.time-input');
+        subs.push({start:times[0].value,end:times[1].value,text:item.querySelector('.sub-text').value});
+    });
+    const style=document.getElementById('captionStyle').value;
+    await fetch('/api/project/{{ project.id }}/subtitles',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({subtitles:subs,style})
+    });
+    alert('Sauvegardé !');
+});
+
+// Export
+document.getElementById('exportBtn').addEventListener('click',()=>{
+    alert('Export en cours... Votre vidéo sera prête dans quelques instants.');
+});
+</script>
+{% endblock %}
