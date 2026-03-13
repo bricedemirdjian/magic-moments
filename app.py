@@ -6,7 +6,9 @@ from flask import Flask, render_template, redirect, url_for, session, request, j
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from authlib.integrations.flask_client import OAuth
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import uuid
 
 load_dotenv()
 
@@ -14,6 +16,14 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['PREFERRED_URL_SCHEME'] = 'https'
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB max
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv', 'webm'}
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Flask-Login
 login_manager = LoginManager()
@@ -198,10 +208,25 @@ def dashboard():
 def new_project():
     if request.method == 'POST':
         title = request.form.get('title', 'Sans titre')
+        video_filename = None
+        video_url = None
+
+        # Handle video file upload
+        if 'video' in request.files:
+            file = request.files['video']
+            if file and file.filename and allowed_file(file.filename):
+                ext = file.filename.rsplit('.', 1)[1].lower()
+                unique_name = f"{uuid.uuid4().hex}.{ext}"
+                filepath = os.path.join(UPLOAD_FOLDER, unique_name)
+                file.save(filepath)
+                video_filename = unique_name
+                video_url = url_for('static', filename=f'uploads/{unique_name}')
+                title = file.filename.rsplit('.', 1)[0]
+
         conn = get_db()
         conn.execute(
-            'INSERT INTO projects (user_id, title) VALUES (?, ?)',
-            (current_user.id, title)
+            'INSERT INTO projects (user_id, title, video_filename, video_url) VALUES (?, ?, ?, ?)',
+            (current_user.id, title, video_filename, video_url)
         )
         conn.commit()
         project = conn.execute(

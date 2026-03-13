@@ -25,10 +25,14 @@
             <div class="phone-frame">
                 <div class="phone-notch"></div>
                 <div class="phone-screen">
+                    {% if project.video_url %}
+                    <video id="projectVideo" src="{{ project.video_url }}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;" playsinline></video>
+                    {% else %}
                     <div class="video-placeholder">
                         <svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.3"/><path d="M20 16V32L32 24L20 16Z" fill="currentColor" opacity="0.5"/></svg>
                         <p>Aperçu vidéo</p>
                     </div>
+                    {% endif %}
                     <div class="preview-captions" id="previewCaptions">
                         <div class="caption-line active" data-style="classic">
                             <span class="caption-text">Votre texte apparaîtra ici</span>
@@ -298,5 +302,22 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
 document.getElementById('exportBtn').addEventListener('click',()=>{
     alert('Export en cours... Votre vidéo sera prête dans quelques instants.');
 });
+
+// Video play/pause
+const video = document.getElementById('projectVideo');
+if (video) {
+    document.getElementById('playBtn').addEventListener('click', () => {
+        if (video.paused) { video.play(); } else { video.pause(); }
+    });
+    video.addEventListener('timeupdate', () => {
+        const pct = (video.currentTime / video.duration) * 100;
+        document.querySelector('.timeline-progress').style.width = pct + '%';
+        document.querySelector('.timeline-handle').style.left = pct + '%';
+        const cur = Math.floor(video.currentTime);
+        const dur = Math.floor(video.duration) || 0;
+        const fmt = (s) => Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+        document.querySelector('.time-display').textContent = fmt(cur) + ' / ' + fmt(dur);
+    });
+}
 </script>
 {% endblock %}

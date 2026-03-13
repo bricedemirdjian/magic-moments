@@ -9,8 +9,9 @@
         <p>Choisissez une méthode pour créer votre prochain short viral.</p>
 
         <div class="create-grid">
-            <form method="POST" class="create-card" id="uploadForm">
+            <form method="POST" class="create-card" id="uploadForm" enctype="multipart/form-data">
                 <input type="hidden" name="title" value="Nouvelle vidéo">
+                <input type="file" name="video" id="videoInput" accept="video/*" style="display:none">
                 <div class="create-icon ci-orange">
                     <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M16 4V28M4 16H28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
                 </div>
@@ -18,10 +19,10 @@
                 <p>Importez votre vidéo et laissez l'IA faire le reste.</p>
                 <div class="upload-zone" id="uploadZone">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><path d="M20 28V12M12 20L20 12L28 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 28H34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                    <span>Glissez votre vidéo ici ou <em>cliquez pour parcourir</em></span>
+                    <span id="uploadLabel">Glissez votre vidéo ici ou <em>cliquez pour parcourir</em></span>
                     <small>MP4, MOV, AVI — Max 500MB</small>
                 </div>
-                <button type="submit" class="btn-primary-sm" style="width:100%;margin-top:16px">Commencer le projet</button>
+                <button type="submit" class="btn-primary-sm" style="width:100%;margin-top:16px" id="uploadBtn">Commencer le projet</button>
             </form>
 
             <form method="POST" class="create-card">
@@ -52,4 +53,52 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const zone = document.getElementById('uploadZone');
+const input = document.getElementById('videoInput');
+const label = document.getElementById('uploadLabel');
+const btn = document.getElementById('uploadBtn');
+
+zone.addEventListener('click', () => input.click());
+
+input.addEventListener('change', () => {
+    if (input.files.length > 0) {
+        const file = input.files[0];
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        label.innerHTML = '<strong>' + file.name + '</strong> (' + sizeMB + ' MB)';
+        zone.style.borderColor = '#FF4F01';
+        zone.style.background = 'rgba(255,79,1,0.08)';
+    }
+});
+
+zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = '#FF4F01'; zone.style.background = 'rgba(255,79,1,0.08)'; });
+zone.addEventListener('dragleave', () => { if (!input.files.length) { zone.style.borderColor = ''; zone.style.background = ''; } });
+zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].type.startsWith('video/')) {
+        input.files = files;
+        const file = files[0];
+        const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+        label.innerHTML = '<strong>' + file.name + '</strong> (' + sizeMB + ' MB)';
+        zone.style.borderColor = '#FF4F01';
+        zone.style.background = 'rgba(255,79,1,0.08)';
+    }
+});
+
+document.getElementById('uploadForm').addEventListener('submit', (e) => {
+    if (!input.files.length) {
+        e.preventDefault();
+        zone.style.borderColor = '#ef4444';
+        label.innerHTML = '<span style="color:#ef4444">Veuillez d\'abord choisir une vidéo</span>';
+        setTimeout(() => { zone.style.borderColor = ''; label.innerHTML = 'Glissez votre vidéo ici ou <em>cliquez pour parcourir</em>'; }, 2000);
+    } else {
+        btn.textContent = 'Upload en cours...';
+        btn.disabled = true;
+    }
+});
+</script>
 {% endblock %}
